@@ -119,17 +119,21 @@ public class Boss : MonoBehaviour
     {
         airstrikeAttack.Invoke();
         currentAttack = Attacks.Airstrike;
-        Debug.Log("Performing Airstrike");
+        airstrikeAttack.indicator.transform.position = SceneManager.instance.center.position;
     }
 
     void AirstrikeUpdate()
     {
-        if(airstrikeAttack.airstriking)
+        float inputX = (InputManager.instance.player1.GetAxis("XLook"));
+        float inputY = (InputManager.instance.player1.GetAxis("YLook"));
+        airstrikeAttack.indicator.transform.position += new Vector3(inputX, 0, inputY) * Time.deltaTime * airstrikeAttack.moveSpeed;
+
+        if (airstrikeAttack.airstriking)
         {
             AirstrikeHappening();
             return;
         }
-        airstrikeAttack.indicator.transform.position = SceneManager.instance.center.position;
+
         airstrikeAttack.indicator.gameObject.SetActive(true);
 
         if (InputManager.instance.player1.GetButtonDown("Select"))
@@ -146,9 +150,7 @@ public class Boss : MonoBehaviour
 
     void AirstrikeHappening()
     {
-        float inputX = (InputManager.instance.player1.GetAxis("XLook"));
-        float inputY = (InputManager.instance.player1.GetAxis("YLook"));
-        airstrikeAttack.indicator.transform.position += new Vector3(inputX, 0, inputY) * Time.deltaTime * airstrikeAttack.moveSpeed;
+
     }
 
     #region Swimming
