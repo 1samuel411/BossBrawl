@@ -21,7 +21,7 @@ public class MoveToFloor : MonoBehaviour
         Vector3 pos = transform.position;
         pos.x = Mathf.Clamp(pos.x, clampX.x, clampX.y);
         pos.z = Mathf.Clamp(pos.z, clampZ.x, clampZ.y);
-        transform.position = pos;
+        //transform.position = pos;
 
         // Create ray
         RaycastHit hit;

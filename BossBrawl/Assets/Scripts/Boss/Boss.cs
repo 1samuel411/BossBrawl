@@ -129,11 +129,11 @@ public class Boss : MonoBehaviour
             AirstrikeHappening();
             return;
         }
+        airstrikeAttack.indicator.transform.position = SceneManager.instance.center.position;
         airstrikeAttack.indicator.gameObject.SetActive(true);
 
         if (InputManager.instance.player1.GetButtonDown("Select"))
         {
-            airstrikeAttack.indicator.transform.position = SceneManager.instance.center.position;
             airstrikeAttack.airstriking = true;
         }
         if(InputManager.instance.player1.GetButtonDown("Cancel"))

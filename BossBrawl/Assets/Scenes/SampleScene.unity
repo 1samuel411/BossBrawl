@@ -15545,7 +15545,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   currentAttack: 3
-  curDirection: 0
+  curDirection: 2
   toggled: 1
   fistAttack:
     icon: {fileID: 0}
@@ -21021,7 +21021,7 @@ MonoBehaviour:
     holder: {fileID: 19251785}
   - dir: 3
     holder: {fileID: 1601356934}
-  center: {fileID: 0}
+  center: {fileID: 1369261404}
 --- !u!1 &1629575228
 GameObject:
   m_ObjectHideFlags: 0
