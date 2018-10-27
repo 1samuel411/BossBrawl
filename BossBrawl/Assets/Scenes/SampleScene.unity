@@ -15591,7 +15591,7 @@ MonoBehaviour:
     icon: {fileID: 0}
     cooldown: 0
     curCooldown: 0
-    moveSpeed: 0
+    moveSpeed: 5
     inputControl: Attack2
     attack: 0
     missile: {fileID: 1341917536000736, guid: 9372550468ad35d43b62260b3dcde49b, type: 2}
