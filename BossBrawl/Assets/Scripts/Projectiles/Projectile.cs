@@ -8,9 +8,11 @@ public class Projectile : MonoBehaviour
     public GameObject mesh;
     public GameObject[] impact;
     public new ParticleSystem particleSystem;
-    public float impactKillTime;
+    private float impactKillTime = -1;
     private new Rigidbody rigidbody;
     private new Collider collider;
+
+    public float initVelocity;
 
     private void Awake()
     {
@@ -20,12 +22,13 @@ public class Projectile : MonoBehaviour
 
     void Start()
     {
-
     }
 
     void Update()
     {
-        if(impactKillTime != -1 && Time.time >= impactKillTime)
+        rigidbody.velocity = (transform.forward * initVelocity);
+
+        if (impactKillTime != -1 && Time.time >= impactKillTime)
         {
             Destroy(gameObject);
         }

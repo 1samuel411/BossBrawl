@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class Boss : MonoBehaviour
 {
@@ -18,7 +19,7 @@ public class Boss : MonoBehaviour
     [System.Serializable]
     public class Attack
     {
-        public Sprite icon;
+        public Image icon;
         public float cooldown;
         public float curCooldown;
         public float moveSpeed;
@@ -41,8 +42,12 @@ public class Boss : MonoBehaviour
     public class AirstrikeAttack : Attack
     {
         public GameObject missile;
+        public float missileYSpawnPos;
         public Transform indicator;
         public bool airstriking;
+        public float time;
+        public float curTimer;
+        public Text text;
     }
     [System.Serializable]
     public class FistAttack : Attack
@@ -74,6 +79,8 @@ public class Boss : MonoBehaviour
     {
         DoAttack();
 
+        UpdateUI();
+
         if (currentAttack != Attacks.None)
             return;
 
@@ -96,6 +103,18 @@ public class Boss : MonoBehaviour
         }
     }
 
+    void UpdateUI()
+    {
+        fistAttack.icon.fillAmount = ((Time.time - fistAttack.curCooldown) + fistAttack.cooldown) / fistAttack.cooldown;
+        airstrikeAttack.icon.fillAmount = ((Time.time - airstrikeAttack.curCooldown) + airstrikeAttack.cooldown) / airstrikeAttack.cooldown;
+        swimAttack.icon.fillAmount = ((Time.time - swimAttack.curCooldown) + swimAttack.cooldown) / swimAttack.cooldown;
+
+        if (airstrikeAttack.airstriking)
+            airstrikeAttack.icon.fillAmount = 0;
+        if (swimAttack.swimming)
+            swimAttack.icon.fillAmount = 0;
+    }
+
     public void DoAttack()
     {
         switch(currentAttack)
@@ -115,9 +134,9 @@ public class Boss : MonoBehaviour
         Debug.Log("Performing Fist");
     }
 
+    #region Airstrike
     public void PerformAirstrike()
     {
-        airstrikeAttack.Invoke();
         currentAttack = Attacks.Airstrike;
         airstrikeAttack.indicator.transform.position = SceneManager.instance.center.position;
     }
@@ -126,7 +145,9 @@ public class Boss : MonoBehaviour
     {
         float inputX = (InputManager.instance.player1.GetAxis("XLook"));
         float inputY = (InputManager.instance.player1.GetAxis("YLook"));
-        airstrikeAttack.indicator.transform.position += new Vector3(inputX, 0, inputY) * Time.deltaTime * airstrikeAttack.moveSpeed;
+        Vector3 movement = new Vector3(inputX, 0, inputY);
+        movement = transform.TransformDirection(movement);
+        airstrikeAttack.indicator.transform.position += movement * Time.deltaTime * airstrikeAttack.moveSpeed;
 
         if (airstrikeAttack.airstriking)
         {
@@ -138,6 +159,7 @@ public class Boss : MonoBehaviour
 
         if (InputManager.instance.player1.GetButtonDown("Select"))
         {
+            airstrikeAttack.curTimer = Time.time + airstrikeAttack.time;
             airstrikeAttack.airstriking = true;
         }
         if(InputManager.instance.player1.GetButtonDown("Cancel"))
@@ -148,15 +170,39 @@ public class Boss : MonoBehaviour
         }
     }
 
+    private float strikeTimer;
     void AirstrikeHappening()
     {
+        float timeLeft = airstrikeAttack.curTimer - Time.time;
+        airstrikeAttack.text.text = ((int)timeLeft).ToString();
 
+        if(Time.time >= strikeTimer)
+        {
+            SpawnMissile();
+            strikeTimer = Time.time + 0.5f + Random.Range(-0.4f, 0.1f);
+        }
+
+        if(timeLeft <= 0)
+        {
+            currentAttack = Attacks.None;
+            airstrikeAttack.airstriking = false;
+            airstrikeAttack.indicator.gameObject.SetActive(false);
+            airstrikeAttack.text.text = "";
+            airstrikeAttack.Invoke();
+        }
     }
+
+    void SpawnMissile()
+    {
+        GameObject missile = Instantiate(airstrikeAttack.missile);
+        missile.transform.position = new Vector3(airstrikeAttack.indicator.transform.position.x + Random.Range(-6, 6), airstrikeAttack.missileYSpawnPos, airstrikeAttack.indicator.transform.position.z + Random.Range(-6, 6));
+        missile.transform.LookAt(airstrikeAttack.indicator);
+    }
+    #endregion
 
     #region Swimming
     public void PerformSwim()
     {
-        swimAttack.Invoke();
         currentAttack = Attacks.Swim;
         swimAttack.targetDirection = curDirection;
     }
@@ -173,8 +219,9 @@ public class Boss : MonoBehaviour
         swimAttack.directionIndicator.transform.position = SceneManager.instance.GetBossPosition(swimAttack.targetDirection).holder.position;
 
         float inputX = (InputManager.instance.player1.GetAxis("XLook"));
+        float inputY = (InputManager.instance.player1.GetAxis("YLook"));
 
-        if (inputX <= 0.5f)
+        if (inputX <= -0.5f)
         {
             // left
             switch (curDirection)
@@ -222,7 +269,7 @@ public class Boss : MonoBehaviour
             }
         }
 
-        if(inputX == 0)
+        if(inputY > 0.5f || swimAttack.targetDirection == curDirection)
         {
             // straight
             switch (curDirection)
@@ -292,6 +339,7 @@ public class Boss : MonoBehaviour
         yield return new WaitForSeconds(0.2f);
         swimAttack.swimming = false;
         currentAttack = Attacks.None;
+        swimAttack.Invoke();
     }
     #endregion
 

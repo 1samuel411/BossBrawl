@@ -15,6 +15,9 @@ public class FollowCamera : MonoBehaviour {
 
     void LateUpdate()
     {
+        if (Time.timeScale <= 0)
+            return;
+
         float horizontal = Input.GetAxis("Mouse X") * rotateSpeed;
         target.transform.Rotate(0, horizontal, 0);
 

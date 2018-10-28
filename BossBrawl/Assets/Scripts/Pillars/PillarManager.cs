@@ -113,7 +113,7 @@ public class PillarManager : MonoBehaviour
             // cols
             for (int x = 0; x < split[y].Length; x++)
             {
-                float yOffset = int.Parse(split[y][x].ToString());
+                float yOffset = int.Parse(split[y][x].ToString()) * 0.5f;
                 if (yOffset == 0)
                     yOffset -= 100;
                 else

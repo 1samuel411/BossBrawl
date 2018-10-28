@@ -12,7 +12,7 @@ public class Health : MonoBehaviour
     public delegate void OnHealing(int currentHealth);
     public OnHealing onHealing;
 
-    public RectTransform healthBar;
+    public Image healthBar;
 
     public void TakeDamage(int amount)
     {
@@ -22,14 +22,12 @@ public class Health : MonoBehaviour
         {
             currentHealth = 0;
             Debug.Log("Dead!");
-
-           
         }
     }
 
     public void Update()
     {
-        healthBar.sizeDelta = new Vector2(currentHealth, healthBar.sizeDelta.y);
+        healthBar.fillAmount = (float)currentHealth / maxHealth;
     }
 
 

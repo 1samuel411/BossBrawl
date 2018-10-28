@@ -10,23 +10,24 @@ public class PlayerController : MonoBehaviour
     public float moveSpeed;
 
     public float rollDistance;
-    private Rigidbody rb;
+    private CharacterController cc;
+    private Health health;
     public float rollCD;
     private float coolDown;
-
-    public Health health;
+    private bool jump;
+    private bool rolling;
+    private float rollTimer;
 
     private bool isGrounded = true;
     public float jumpHeight;
 
-
-
-
+    public float gravity;
+    private Vector3 moveDirection;
 
     // Use this for initialization
     void Start()
     {
-        rb = GetComponent<Rigidbody>();
+        cc = GetComponent<CharacterController>();
         health = GetComponent<Health>();
         health.onDamage += OnDamaged;
 
@@ -34,77 +35,61 @@ public class PlayerController : MonoBehaviour
 
     void OnDamaged(int healthLost)
     {
-        Debug.Log(health.currentHealth);
+
     }
 
     // Update is called once per frame
     void Update()
     {
 
-        var x = Input.GetAxis("Vertical") * Time.deltaTime * moveSpeed;
-        var y = Input.GetAxis("Horizontal") * Time.deltaTime * moveSpeed;
+        if (rolling)
+        {
+            if (Time.time >= rollTimer)
+                rolling = false;
+        }
+        else
+        {
+            if (cc.isGrounded || jump)
+            {
+                // We are grounded, so recalculate
+                // move direction directly from axes
 
-        transform.Translate(0, 0, x);
-        transform.Translate(y, 0, 0);
+                moveDirection = new Vector3(Input.GetAxis("Horizontal"), 0.0f, Input.GetAxis("Vertical"));
+                moveDirection = transform.TransformDirection(moveDirection);
+                moveDirection = moveDirection * moveSpeed;
 
-        // coolDown = Time.time + rollCD;
+                if (Input.GetButton("Jump") || jump)
+                {
+                    jump = false;
+                    moveDirection.y = jumpHeight;
+                }
+            }
+        }
 
+        // Apply gravity
+        moveDirection.y = moveDirection.y - (gravity * Time.deltaTime);
 
-
+        // Move the controller
+        cc.Move(moveDirection * Time.deltaTime);
 
         if (Input.GetKeyDown(KeyCode.Q))
         {
             if (coolDown <= Time.time)
             {
-                if (isGrounded == true)
-                {
-                    rb.velocity = transform.forward * rollDistance;
-                }
+                rolling = true;
+                moveDirection = (transform.forward * rollDistance);
+                rollTimer = Time.time + 0.8f;
             }
         }
-
-        if (Input.GetKeyDown(KeyCode.Space))
-        {
-            jump();
-        }
-
-        if (Input.GetKeyDown(KeyCode.G))
-        {
-            health.TakeDamage(5);
-        }
-
     }
 
-    private void jump()
+    void OnControllerColliderHit(ControllerColliderHit hit)
     {
-        if (isGrounded == true)
+        if (hit.gameObject.tag == "Lava")
         {
-            rb.AddForce(Vector3.up * jumpHeight);
-        }
-    }
-
-
-    void OnCollisionExit(Collision other)
-    {
-        if (other.gameObject.tag == "Ground")
-        {
-            isGrounded = false;
-        }
-
-    }
-    void OnCollisionEnter(Collision other)
-    {
-        if (other.gameObject.tag == "Ground")
-        {
-            isGrounded = true;
-        }
-
-        if (other.gameObject.tag == "Lava")
-        {
-            jump();
+            jump = true;
             isGrounded = true;
             health.TakeDamage(5);
-            Debug.Log("You are in Lava");
         }
     }
 

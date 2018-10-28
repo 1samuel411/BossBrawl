@@ -5,13 +5,4 @@ using UnityEngine;
 public class StoneProjectile : Projectile
 {
 
-    void Start()
-    {
-
-    }
-
-    void Update()
-    {
-
-    }
 }
