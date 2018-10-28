@@ -13,6 +13,13 @@ public class PillarManager : MonoBehaviour
     public float xOffsetOdd = 1.72f;
     public float xOffsetEven = 1.72f;
 
+    public float intensity = 12;
+    public float intensityMultiplier = 12;
+    public float falloff = 1.5f;
+    public float intensityReduction = 12;
+    public float period = 12;
+    public float yInitOffset;
+
     public List<Pillar> generatedMap = new List<Pillar>();
     public GameObject[] pillars;
 
@@ -23,6 +30,7 @@ public class PillarManager : MonoBehaviour
         public int x;
         public int y;
         public float yOffset;
+        public bool enabled;
     }
 
     private string mapToGenerate =
@@ -114,12 +122,17 @@ public class PillarManager : MonoBehaviour
             // cols
             for (int x = 0; x < split[y].Length; x++)
             {
+                bool enabled = true;
                 float yOffset = int.Parse(split[y][x].ToString()) * 0.5f;
                 if (yOffset == 0)
-                    yOffset -= 100;
+                {
+                    yOffset = -10;
+                    enabled = false;
+                }
                 else
                     yOffset += UnityEngine.Random.Range(-0.1f, 0.1f);
                 generatedMap.Find(p => p.x == x && p.y == y).yOffset = yOffset;
+                generatedMap.Find(p => p.x == x && p.y == y).enabled = enabled;
             }
         }
     }
@@ -132,95 +145,44 @@ public class PillarManager : MonoBehaviour
         }
     }
 
-    public void Test()
-    {
-        Impact(Random.Range(0, 12), Random.Range(0, 12), 4.0f);   
-    }
-
     public void Impact(int x, int y, float intensity)
     {
-        Vector2[] p = new Vector2[4];
-        Vector2[] k = new Vector2[4];
-        Vector2[] t = new Vector2[12];
-
-        p[0] = new Vector2(x - 1, y);
-        p[1] = new Vector2(x + 1, y);
-        p[2] = new Vector2(x, y + 1);
-        p[3] = new Vector2(x, y - 1);
-
-        k[0] = new Vector2(x + 1, y+1);
-        k[1] = new Vector2(x - 1, y+1);
-        k[2] = new Vector2(x + 1, y-1);
-        k[3] = new Vector2(x - 1, y-1);
-
-        t[0] = new Vector2(x - 2, y + 1);
-        t[1] = new Vector2(x - 2, y);
-        t[2] = new Vector2(x - 2, y - 1);
-
-        t[3] = new Vector2(x + 2, y + 1);
-        t[4] = new Vector2(x + 2, y);
-        t[5] = new Vector2(x + 2, y - 1);
-
-        t[6] = new Vector2(x - 1, y - 2);
-        t[7] = new Vector2(x, y - 2);
-        t[8] = new Vector2(x + 1, y - 2);
-
-        t[9] = new Vector2(x - 1, y + 2);
-        t[10] = new Vector2(x, y + 2);
-        t[11] = new Vector2(x + 1, y + 2);
-
-        // Get radius
-        //   t t t  
-        // t k p k t
-        // t p o p t
-        // t k p k t
-        //   t t t  
-
-
-        StartCoroutine(ImpactCoroutine(p, k, t, intensity));
+        this.intensity = intensity;
+        StartCoroutine(ImpactCoroutine(new Vector2(x, y)));
     }
 
-    IEnumerator ImpactCoroutine(Vector2[] p, Vector2[] k, Vector2[] t, float intensity)
+    IEnumerator ImpactCoroutine(Vector2 a)
     {
-        Debug.Log("Testing");
-        float period = 2 * Mathf.PI;
-
-        while (intensity <= 0f)
+        while (intensity > 0f)
         {
             string[] map = mapToGenerate.Split('.');
             int width = map[0].Length;
             int height = map.Length;
 
-            period += Time.time * 3;
-            intensity -= Time.time * 3;
-            for (int i = 0; i < p.Length; i++)
-            {
-                // valid cord
-                if (p[i].x >= 0 && p[i].x <= width && p[i].y >= 0 && p[i].y <= height)
-                {
-                    generatedMap.Single(x => x.x == p[i].x && x.y == p[i].y).yOffset = intensity * Mathf.Sin(period * Time.deltaTime);
-                }
-            }
+            //period += Time.deltaTime * 3;
+            intensity -= Time.deltaTime * intensityReduction;
 
-            for (int i = 0; i < k.Length; i++)
+            for(int i = 0; i < generatedMap.Count; i++)
             {
-                // valid cord
-                if (k[i].x >= 0 && k[i].x <= width && k[i].y >= 0 && k[i].y <= height)
-                {
-                    generatedMap.Single(x => x.x == k[i].x && x.y == k[i].y).yOffset = intensity * Mathf.Sin(period * Time.deltaTime);
-                }
-            }
+                if (!generatedMap[i].enabled)
+                    continue;
+                float difference = (a - new Vector2(generatedMap[i].x, generatedMap[i].y)).magnitude;
 
-            for (int i = 0; i < t.Length; i++)
-            {
-                // valid cord
-                if (t[i].x >= 0 && t[i].x <= width && t[i].y >= 0 && t[i].y <= height)
-                {
-                    generatedMap.Single(x => x.x == t[i].x && x.y == t[i].y).yOffset = intensity * Mathf.Sin(period * Time.deltaTime);
-                }
+                generatedMap[i].yOffset = yInitOffset + ((falloff/difference) * (intensity * intensityMultiplier) * Mathf.Sin(Time.time * period * difference) * Time.deltaTime);
             }
 
             yield return null;
+        }
+    }
+
+    void SetOffset(float newOffset, int x, int y)
+    {
+        for(int i =0; i < generatedMap.Count; i++)
+        {
+            if(generatedMap[i].x == x && generatedMap[i].y == y && generatedMap[i].enabled)
+            {
+                generatedMap[i].yOffset = newOffset;
+            }
         }
     }
 

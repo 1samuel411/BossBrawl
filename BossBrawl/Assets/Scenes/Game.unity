@@ -1742,6 +1742,12 @@ MonoBehaviour:
   zOffsetEven: 1.49
   xOffsetOdd: 0.85
   xOffsetEven: 1.72
+  intensity: 0
+  intensityMultiplier: 5.46
+  falloff: 1.5
+  intensityReduction: 2.3
+  period: 3.6
+  yInitOffset: 0.4
   generatedMap: []
   pillars:
   - {fileID: 1017171014756776, guid: 7558adf3b68b4d34296868ab0ec7ab18, type: 2}
@@ -2729,7 +2735,7 @@ Transform:
   m_GameObject: {fileID: 1889920462}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 100, y: 1, z: 100}
+  m_LocalScale: {x: 75, y: 1, z: 75}
   m_Children: []
   m_Father: {fileID: 871608666}
   m_RootOrder: 0

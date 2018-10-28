@@ -92,11 +92,6 @@ public class PlayerController : MonoBehaviour
                 coolDown = Time.time + rollCD;
             }
         }
-
-        if(Input.GetKeyDown(KeyCode.I))
-        {
-            PillarManager.instance.Test();
-        }
     }
 
     void OnControllerColliderHit(ControllerColliderHit hit)
