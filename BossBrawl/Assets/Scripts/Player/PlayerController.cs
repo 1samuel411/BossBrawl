@@ -18,11 +18,19 @@ public class PlayerController : MonoBehaviour
     private bool rolling;
     private float rollTimer;
 
-    private bool isGrounded = true;
+    public bool isGrounded = true;
     public float jumpHeight;
 
     public float gravity;
     private Vector3 moveDirection;
+
+    public bool isMoving
+    {
+        get
+        {
+            return new Vector3(cc.velocity.x, 0, cc.velocity.z).magnitude > 0f;
+        }
+    }
 
     // Use this for initialization
     void Start()
@@ -41,6 +49,7 @@ public class PlayerController : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        isGrounded = cc.isGrounded;
 
         if (rolling)
         {
@@ -67,7 +76,8 @@ public class PlayerController : MonoBehaviour
         }
 
         // Apply gravity
-        moveDirection.y = moveDirection.y - (gravity * Time.deltaTime);
+        if(!rolling)
+            moveDirection.y = moveDirection.y - (gravity * Time.deltaTime);
 
         // Move the controller
         cc.Move(moveDirection * Time.deltaTime);
@@ -78,8 +88,14 @@ public class PlayerController : MonoBehaviour
             {
                 rolling = true;
                 moveDirection = (transform.forward * rollDistance);
-                rollTimer = Time.time + 0.8f;
+                rollTimer = Time.time + 0.3f;
+                coolDown = Time.time + rollCD;
             }
+        }
+
+        if(Input.GetKeyDown(KeyCode.I))
+        {
+            PillarManager.instance.Test();
         }
     }
 

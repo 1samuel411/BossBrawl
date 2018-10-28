@@ -5,12 +5,13 @@ using UnityEngine;
 public class FollowCamera : MonoBehaviour {
 
     public GameObject target;
+    private PlayerController playerController;
     public float rotateSpeed = 5;
-    Vector3 offset;
+    public Vector3 offsetPos;
 
     void Start()
     {
-        offset = target.transform.position - transform.position;
+        playerController = target.GetComponent<PlayerController>();
     }
 
     void LateUpdate()
@@ -19,12 +20,11 @@ public class FollowCamera : MonoBehaviour {
             return;
 
         float horizontal = Input.GetAxis("Mouse X") * rotateSpeed;
-        target.transform.Rotate(0, horizontal, 0);
+        transform.eulerAngles += new Vector3(0, horizontal, 0) * Time.deltaTime;
 
-        float desiredAngle = target.transform.eulerAngles.y;
-        Quaternion rotation = Quaternion.Euler(0, desiredAngle, 0);
-        transform.position = target.transform.position - (rotation * offset);
+        transform.position = target.transform.position + offsetPos;
 
-        transform.LookAt(target.transform);
+        if (playerController.isGrounded && playerController.isMoving)
+            target.transform.eulerAngles = new Vector3(target.transform.eulerAngles.x, transform.eulerAngles.y, target.transform.eulerAngles.z);
     }
 }
