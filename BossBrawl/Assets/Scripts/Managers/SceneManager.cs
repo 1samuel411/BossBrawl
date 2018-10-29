@@ -18,6 +18,8 @@ public class SceneManager : MonoBehaviour
     }
     public BossPosition[] bossPositions;
 
+    public GameObject playerObj;
+
     public Transform center;
 
     private void Awake()

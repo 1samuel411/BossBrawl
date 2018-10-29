@@ -14,6 +14,7 @@ public class PillarManager : MonoBehaviour
     public float xOffsetEven = 1.72f;
 
     public float intensity = 12;
+    public float intensityDef = 12;
     public float intensityMultiplier = 12;
     public float falloff = 1.5f;
     public float intensityReduction = 12;
@@ -54,12 +55,38 @@ public class PillarManager : MonoBehaviour
         "111111111111." +
         "111114111111." +
         "001113111100." +
-        "003333333300." +
+        "003333113300." +
         "001111111100." +
-        "001111111100." +
-        "111111111111." +
-        "111111111111." +
+        "001111311100." +
+        "111122111111." +
+        "111211111111." +
         "111000000111." +
+        "111000000111.",
+
+        "111000000111." +
+        "111000000111." +
+        "111111112111." +
+        "111311131111." +
+        "001112111100." +
+        "001112111100." +
+        "001112111100." +
+        "001212311100." +
+        "112122111111." +
+        "111211111111." +
+        "111000000111." +
+        "111000000111.",
+
+        "111000000111." +
+        "112000000111." +
+        "112111113111." +
+        "112114111111." +
+        "002113111100." +
+        "001113111300." +
+        "001111121100." +
+        "001111311100." +
+        "113122111111." +
+        "141211111111." +
+        "121000000111." +
         "111000000111."
     };
 
@@ -151,6 +178,13 @@ public class PillarManager : MonoBehaviour
         StartCoroutine(ImpactCoroutine(new Vector2(x, y)));
     }
 
+    public void Impact(GameObject hexagon)
+    {
+        this.intensity = intensityDef;
+        Pillar pillar = generatedMap.Find(x => x.transform == hexagon.transform);
+        StartCoroutine(ImpactCoroutine(new Vector2(pillar.x, pillar.y)));
+    }
+
     IEnumerator ImpactCoroutine(Vector2 a)
     {
         while (intensity > 0f)
@@ -173,6 +207,7 @@ public class PillarManager : MonoBehaviour
 
             yield return null;
         }
+        SetYOffset(stages[Random.Range(0, stages.Length)]);
     }
 
     void SetOffset(float newOffset, int x, int y)

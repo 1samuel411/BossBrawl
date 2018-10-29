@@ -15,6 +15,9 @@ public class Boss : MonoBehaviour
 
     public bool toggled = true;
 
+    public Animator animator;
+    public OnTriggerForward triggerForward;
+
     // State manager
     [System.Serializable]
     public class Attack
@@ -22,7 +25,6 @@ public class Boss : MonoBehaviour
         public Image icon;
         public float cooldown;
         public float curCooldown;
-        public float moveSpeed;
         public string inputControl;
         public bool canAttack
         {
@@ -44,6 +46,7 @@ public class Boss : MonoBehaviour
         public GameObject missile;
         public float missileYSpawnPos;
         public Transform indicator;
+        public float moveSpeed;
         public bool airstriking;
         public float time;
         public float curTimer;
@@ -52,7 +55,7 @@ public class Boss : MonoBehaviour
     [System.Serializable]
     public class FistAttack : Attack
     {
-
+        public bool happening;
     }
     [System.Serializable]
     public class SwimAttack : Attack
@@ -69,14 +72,27 @@ public class Boss : MonoBehaviour
     public FistAttack fistAttack;
     public AirstrikeAttack airstrikeAttack;
     public SwimAttack swimAttack;
+    public Health health;
+    private bool dead = false;
 
     void Start()
     {
         UpdatePosition();
+        triggerForward.eventForwardDelegate += OnHexagonTriggerEnter;
+        health = GetComponent<Health>();
+        health.onDeath += OnDeath;
+    }
+
+    public void OnHexagonTriggerEnter(Collider collider)
+    {
+        hexagonInFront = collider.gameObject;
     }
 
     void Update()
     {
+        if (dead)
+            return;
+
         DoAttack();
 
         UpdateUI();
@@ -125,14 +141,62 @@ public class Boss : MonoBehaviour
             case Attacks.Airstrike:
                 AirstrikeUpdate();
                 break;
+            case Attacks.Fist:
+                FistUpdate();
+                break;
         }
     }
 
+    void OnDeath()
+    {
+        //GameOver.instance.Death();
+        dead = true;
+        animator.SetBool("Dead", true);
+    }
+
+    #region Fist attack
     public void PerformFistAttack()
     {
-        fistAttack.Invoke();
+        currentAttack = Attacks.Fist;
         Debug.Log("Performing Fist");
+        animator.SetTrigger("Attack");
+        fistAttack.happening = true;
     }
+
+    void FistUpdate()
+    {
+        fistAttack.Invoke();
+    }
+
+    GameObject hexagonInFront;
+    public void Impact()
+    {
+        if (hexagonInFront == null)
+            return;
+
+        PillarManager.instance.Impact(hexagonInFront);
+
+        // Grounded
+        if (SceneManager.instance.playerObj.GetComponent<PlayerController>().isGrounded)
+        {
+            // Damage
+            SceneManager.instance.playerObj.GetComponent<Health>().TakeDamage(7);
+            SceneManager.instance.playerObj.GetComponent<PlayerController>().jump = true;
+        }
+        if ((transform.position - SceneManager.instance.playerObj.transform.position).sqrMagnitude <= 13)
+        {
+            // Damage
+            SceneManager.instance.playerObj.GetComponent<Health>().TakeDamage(4);
+        }
+    }
+
+    public void CompleteFist()
+    {
+        fistAttack.Invoke();
+        fistAttack.happening = false;
+        currentAttack = Attacks.None;
+    }
+    #endregion
 
     #region Airstrike
     public void PerformAirstrike()
@@ -159,6 +223,8 @@ public class Boss : MonoBehaviour
 
         if (InputManager.instance.player1.GetButtonDown("Select"))
         {
+            animator.SetTrigger("Striking");
+            animator.SetBool("Strike", true);
             airstrikeAttack.curTimer = Time.time + airstrikeAttack.time;
             airstrikeAttack.airstriking = true;
         }
@@ -182,8 +248,9 @@ public class Boss : MonoBehaviour
             strikeTimer = Time.time + 0.5f + Random.Range(-0.4f, 0.1f);
         }
 
-        if(timeLeft <= 0)
+        if (timeLeft <= 0)
         {
+            animator.SetBool("Strike", false);
             currentAttack = Attacks.None;
             airstrikeAttack.airstriking = false;
             airstrikeAttack.indicator.gameObject.SetActive(false);
@@ -311,11 +378,13 @@ public class Boss : MonoBehaviour
         swimAttack.swimming = true;
         swimAttack.directionIndicator.SetActive(false);
         // sink
+        /*
         while (transform.position.y > swimAttack.swimYOffset)
         {
             transform.position += -Vector3.up * swimAttack.swimSpeed * Time.deltaTime;
             yield return null;
-        }
+        }*/
+        animator.SetTrigger("Despawn");
 
         // wait half
         yield return new WaitForSeconds(swimAttack.swimTime / 2);
@@ -329,12 +398,14 @@ public class Boss : MonoBehaviour
         yield return new WaitForSeconds(swimAttack.swimTime/2);
 
 
+        animator.SetTrigger("Spawn");
         // swim up
+        /*
         while (transform.position.y < swimAttack.defaultYOffset)
         {
             transform.position += Vector3.up * swimAttack.swimSpeed * Time.deltaTime;
             yield return null;
-        }
+        }*/
 
         yield return new WaitForSeconds(0.2f);
         swimAttack.swimming = false;
@@ -347,6 +418,7 @@ public class Boss : MonoBehaviour
     {
         SceneManager.BossPosition bossPosition = SceneManager.instance.GetBossPosition(curDirection);
         transform.position = bossPosition.holder.position;
+        transform.position = new Vector3(transform.position.x, swimAttack.swimYOffset, transform.position.z);
         transform.rotation = bossPosition.holder.rotation;
     }
 }

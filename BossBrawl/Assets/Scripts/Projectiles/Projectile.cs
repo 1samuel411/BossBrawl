@@ -49,5 +49,11 @@ public class Projectile : MonoBehaviour
         collider.enabled = false;
 
         impactKillTime = Time.time + 5;
+
+        if((transform.position - SceneManager.instance.playerObj.transform.position).sqrMagnitude <= 4)
+        {
+            // Damage
+            SceneManager.instance.playerObj.GetComponent<Health>().TakeDamage(6);
+        }
     }
 }

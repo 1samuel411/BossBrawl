@@ -11,18 +11,22 @@ public class Health : MonoBehaviour
     public OnDamage onDamage;
     public delegate void OnHealing(int currentHealth);
     public OnHealing onHealing;
+    public delegate void OnDeath();
+    public OnDeath onDeath;
 
     public Image healthBar;
 
     public void TakeDamage(int amount)
     {
         currentHealth -= amount;
-        onDamage(amount);
+        if(onDamage != null)
+            onDamage(amount);
         if (currentHealth <= 0)
         {
             currentHealth = 0;
-            Debug.Log("Dead!");
+            onDeath.Invoke();
         }
+
     }
 
     public void Update()

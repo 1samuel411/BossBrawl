@@ -77,7 +77,7 @@ public class Button : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler, 
     public void OnPointerEnter(PointerEventData eventData)
     {
         Debug.Log("Mouse enter");
-        selected = true;
+        //selected = true;
     }
 
     public void OnPointerExit(PointerEventData eventData)

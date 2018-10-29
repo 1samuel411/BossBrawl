@@ -6,6 +6,7 @@ TagManager:
   tags:
   - Ground
   - Lava
+  - Boss
   layers:
   - Default
   - TransparentFX
@@ -20,7 +21,7 @@ TagManager:
   - PlayerUI
   - Player
   - Projectile
-  - 
+  - Boss
   - 
   - 
   - 

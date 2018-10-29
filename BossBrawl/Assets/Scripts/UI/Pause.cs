@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using Rewired;
+using UnityEngine.SceneManagement;
 
 public class Pause : MenuScreen
 {
@@ -9,10 +10,11 @@ public class Pause : MenuScreen
     private Animator animator;
     private Player inputPlayer;
     public bool paused;
+    public Button[] buttons;
 
     private void Awake()
     {
-        animator = GetComponent<Animator>();
+        animator = GetComponentInChildren<Animator>();
         curButton = defaultButton;
     }
 
@@ -21,9 +23,24 @@ public class Pause : MenuScreen
 
     }
 
+    public void ReturnToMenu()
+    {
+        UnityEngine.SceneManagement.SceneManager.LoadScene("Menu");
+    }
+
     void Update()
     {
+
         animator.SetBool("Open", paused);
+
+        if(!paused)
+        {
+            for(int i = 0; i < buttons.Length; i++)
+            {
+                buttons[i].selected = false;
+            }
+        }
+
         if (InputManager.instance.player1.GetButtonDown("Pause"))
         {
             inputPlayer = InputManager.instance.player1;
