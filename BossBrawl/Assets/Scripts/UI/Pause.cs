@@ -10,7 +10,6 @@ public class Pause : MenuScreen
     private Animator animator;
     private Player inputPlayer;
     public bool paused;
-    public Button[] buttons;
 
     private void Awake()
     {
@@ -26,11 +25,12 @@ public class Pause : MenuScreen
     public void ReturnToMenu()
     {
         UnityEngine.SceneManagement.SceneManager.LoadScene("Menu");
+        PauseToggle();
     }
 
-    void Update()
+    public override void Update()
     {
-
+        base.Update();
         animator.SetBool("Open", paused);
 
         if(!paused)
@@ -50,11 +50,6 @@ public class Pause : MenuScreen
         {
             inputPlayer = InputManager.instance.player2;
             PauseToggle();
-        }
-
-        if(paused && curButton != null)
-        {
-            curButton.selected = true;
         }
     }
 

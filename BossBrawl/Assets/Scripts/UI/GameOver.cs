@@ -17,9 +17,10 @@ public class GameOver : MenuScreen
 
     }
 
-    void Update()
+    public void ReturnToMenu()
     {
-
+        UnityEngine.SceneManagement.SceneManager.LoadScene("Menu");
+        Time.timeScale = 1;
     }
 
     public void Death()

@@ -1,7 +1,8 @@
 fileFormatVersion: 2
 guid: 94776868e96e31f4ead6ad997c7b52b2
 TextureImporter:
-  fileIDToRecycleName: {}
+  fileIDToRecycleName:
+    21300000: Menu_Button_Default_0
   externalObjects: {}
   serializedVersion: 7
   mipmaps:
@@ -40,17 +41,17 @@ TextureImporter:
   nPOTScale: 0
   lightmap: 0
   compressionQuality: 50
-  spriteMode: 1
+  spriteMode: 2
   spriteExtrude: 1
   spriteMeshType: 1
   alignment: 0
   spritePivot: {x: 0.5, y: 0.5}
   spritePixelsToUnits: 100
-  spriteBorder: {x: 0, y: 0, z: 0, w: 0}
+  spriteBorder: {x: 218, y: 152, z: 199, w: 150}
   spriteGenerateFallbackPhysicsShape: 1
   alphaUsage: 1
   alphaIsTransparency: 1
-  spriteTessellationDetail: -1
+  spriteTessellationDetail: 0
   textureType: 8
   textureShape: 1
   singleChannelComponent: 0
@@ -82,8 +83,33 @@ TextureImporter:
     androidETC2FallbackOverride: 0
   spriteSheet:
     serializedVersion: 2
-    sprites: []
-    outline: []
+    sprites:
+    - serializedVersion: 2
+      name: Menu_Button_Default_0
+      rect:
+        serializedVersion: 2
+        x: 184
+        y: 126
+        width: 1113
+        height: 262
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 67a7e25b9eb859449a1f4789f0873040
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    outline:
+    - - {x: -495, y: 98}
+      - {x: -500, y: 91}
+      - {x: -500, y: -99}
+      - {x: 521, y: -99}
+      - {x: 521, y: 98}
     physicsShape: []
     bones: []
     spriteID: 6d8a3d3f511432645946d7382a06111c

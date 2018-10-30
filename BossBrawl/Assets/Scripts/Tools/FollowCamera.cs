@@ -8,6 +8,7 @@ public class FollowCamera : MonoBehaviour {
     private PlayerController playerController;
     public float rotateSpeed = 5;
     public Vector3 offsetPos;
+    public float speed;
 
     void Start()
     {
@@ -16,9 +17,9 @@ public class FollowCamera : MonoBehaviour {
 
     void LateUpdate()
     {
-        transform.localPosition = Vector3.zero;
         if (Time.timeScale <= 0)
             return;
+
 
         float horizontal = InputManager.instance.player2.GetAxis("XLook") * rotateSpeed;
         //float horizontal = Input.GetAxis("Mouse X") * rotateSpeed;
@@ -31,7 +32,7 @@ public class FollowCamera : MonoBehaviour {
         rot.z = 0;
         transform.localEulerAngles = rot;
 
-        transform.position = target.transform.position + offsetPos;
+        transform.position = Vector3.Lerp(transform.position, target.transform.position + offsetPos, speed * Time.deltaTime);
 
         if ((playerController.isGrounded && playerController.isMoving) || playerController.attacking)
             target.transform.eulerAngles = new Vector3(target.transform.eulerAngles.x, transform.eulerAngles.y, target.transform.eulerAngles.z);

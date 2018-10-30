@@ -90,6 +90,11 @@ public class Boss : MonoBehaviour
 
     void Update()
     {
+        if (Time.time == 0)
+            return;
+        if (!doUpdate)
+            return;
+
         if (dead)
             return;
 
@@ -149,7 +154,7 @@ public class Boss : MonoBehaviour
 
     void OnDeath()
     {
-        //GameOver.instance.Death();
+        GameOver.instance.Death();
         dead = true;
         animator.SetBool("Dead", true);
     }
@@ -194,7 +199,7 @@ public class Boss : MonoBehaviour
     {
         fistAttack.Invoke();
         fistAttack.happening = false;
-        currentAttack = Attacks.None;
+        StartCoroutine(WaitFrame());
     }
     #endregion
 
@@ -232,7 +237,7 @@ public class Boss : MonoBehaviour
         {
             airstrikeAttack.airstriking = false;
             airstrikeAttack.indicator.gameObject.SetActive(false);
-            currentAttack = Attacks.None;
+            StartCoroutine(WaitFrame());
         }
     }
 
@@ -251,7 +256,7 @@ public class Boss : MonoBehaviour
         if (timeLeft <= 0)
         {
             animator.SetBool("Strike", false);
-            currentAttack = Attacks.None;
+            StartCoroutine(WaitFrame());
             airstrikeAttack.airstriking = false;
             airstrikeAttack.indicator.gameObject.SetActive(false);
             airstrikeAttack.text.text = "";
@@ -288,7 +293,7 @@ public class Boss : MonoBehaviour
         float inputX = (InputManager.instance.player1.GetAxis("XLook"));
         float inputY = (InputManager.instance.player1.GetAxis("YLook"));
 
-        if (inputX <= -0.5f)
+        if (inputX <= -0.1f)
         {
             // left
             switch (curDirection)
@@ -312,7 +317,7 @@ public class Boss : MonoBehaviour
             }
         }
 
-        if (inputX >= 0.5f)
+        if (inputX >= 0.1f)
         {
             // right
             switch (curDirection)
@@ -336,7 +341,7 @@ public class Boss : MonoBehaviour
             }
         }
 
-        if(inputY > 0.5f || swimAttack.targetDirection == curDirection)
+        if(inputY > 0.1f || swimAttack.targetDirection == curDirection)
         {
             // straight
             switch (curDirection)
@@ -368,7 +373,7 @@ public class Boss : MonoBehaviour
         if(InputManager.instance.player1.GetButtonDown("Cancel"))
         {
             swimAttack.swimming = false;
-            currentAttack = Attacks.None;
+            StartCoroutine(WaitFrame());
             swimAttack.directionIndicator.SetActive(false);
         }
     }
@@ -409,7 +414,7 @@ public class Boss : MonoBehaviour
 
         yield return new WaitForSeconds(0.2f);
         swimAttack.swimming = false;
-        currentAttack = Attacks.None;
+        StartCoroutine(WaitFrame());
         swimAttack.Invoke();
     }
     #endregion
@@ -420,5 +425,14 @@ public class Boss : MonoBehaviour
         transform.position = bossPosition.holder.position;
         transform.position = new Vector3(transform.position.x, swimAttack.swimYOffset, transform.position.z);
         transform.rotation = bossPosition.holder.rotation;
+    }
+
+    private bool doUpdate = true;
+    IEnumerator WaitFrame()
+    {
+        doUpdate = false;
+        yield return null;
+        doUpdate = true;
+        currentAttack = Attacks.None;
     }
 }

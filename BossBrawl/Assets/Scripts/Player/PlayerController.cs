@@ -66,7 +66,7 @@ public class PlayerController : MonoBehaviour
     void OnDead()
     {
         animator.SetBool("Dead", true);
-        //GameOver.instance.Death();
+        GameOver.instance.Death();
         dead = true;
         moveDirection = Vector3.zero;
     }
@@ -77,8 +77,11 @@ public class PlayerController : MonoBehaviour
     void Update()
     {
         if (dead)
+        {
+            cc.Move(Vector3.zero);
+            isGrounded = true;
             return;
-
+        }
 
         isGrounded = cc.isGrounded;
 
